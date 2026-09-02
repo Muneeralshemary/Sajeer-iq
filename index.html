@@ -1,0 +1,886 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Globe, ShoppingCart, BookOpen, PenTool, Building2, 
+  Calculator, Mail, Phone, Send, CheckCircle2, Lock, 
+  ChevronDown, Quote, Menu, X, Star, Award, Users, 
+  Briefcase, Compass, Layout, Maximize, PaintBucket,
+  ArrowRight, ArrowLeft
+} from 'lucide-react';
+
+// --- Translations ---
+const translations = {
+  ar: {
+    brandName: "سجيــر",
+    subtitle: "للهندسة والتصميم والمخطوطات",
+    home: "الرئيسية",
+    philosophy: "فلسفتنا",
+    calligraphy: "روائع المخطوطات",
+    engineering: "الخدمات الهندسية",
+    bookshop: "مكتبة سجيــر",
+    research: "مركز الأبحاث",
+    soon: "قريباً",
+    switchLang: "English",
+    heroTitle: "حيثُ يتلاقى إرث الفن المعماري بسحر الحرف العربي",
+    heroDesc: "نصيغ أفكارك بحلول هندسية مدروسة، ونرسم هويتك بمخطوطات تنبض بالأصالة والجمال، في مزيج أندلسي فريد يعانق المستقبل ولا ينسى الجذور.",
+    discoverMore: "اكتشف إرثنا",
+    
+    // About Section
+    aboutTitle: "فلسفة سجيــر",
+    aboutSubtitle: "روح الأندلس في تصاميم معاصرة",
+    aboutText1: "نحن في سجيـر لا نصمم مباني أو نخط لوحات فحسب، بل نعيد إحياء روح الفن الإسلامي والأندلسي وندمجه بعبقرية الهندسة الحديثة.",
+    aboutText2: "كل زاوية نصممها، وكل حرف نخطه، يحمل في طياته قصة من الدقة، وشغفاً بالتفاصيل التي تخلد في الذاكرة.",
+    
+    // Stats
+    statProjects: "مشروع منجز",
+    statClients: "عميل سعيد",
+    statAwards: "جوائز عالمية",
+    statYears: "سنوات الخبرة",
+
+    // Gallery
+    galleryTitle: "معرض المخطوطات",
+    galleryAll: "الكل",
+    galleryThuluth: "الثلث",
+    galleryDiwani: "الديواني",
+    galleryKufi: "الكوفي",
+    
+    // Request Form
+    requestCustom: "اطلب مخطوطتك الخاصة",
+    wordPhrase: "الكلمة أو العبارة",
+    style: "النمط الخطي",
+    useCase: "الاستخدام (شعار، لوحة فنية...)",
+    submitOrder: "أرسل الطلب",
+    orderSuccess: "تم استلام طلبك ببالغ التقدير! سنتواصل معك قريباً.",
+    
+    // Calculator
+    priceEstimator: "المنظومة الهندسية للتقدير",
+    designType: "صنف التصميم",
+    scale: "نطاق المشروع",
+    estPrice: "التقدير المبدئي للاستثمار:",
+    currency: "دولار",
+    types: {
+      arch: "معماري",
+      struct: "إنشائي",
+      landscape: "لاندسكيب",
+      furniture: "داخلي",
+      qs: "حساب كميات"
+    },
+    scales: {
+      small: "صغير (أقل من 200 م²)",
+      medium: "متوسط (200 - 500 م²)",
+      large: "كبير (أكثر من 500 م²)"
+    },
+    contactUs: "مجلس التواصل",
+    rights: "جميع الحقوق محفوظة © 2026 سجيــر.",
+    sampleCalligraphy: "من بديع أعمالنا",
+    reqQuote: "طلب عرض سعر تفصيلي",
+  },
+  en: {
+    brandName: "Sajeer",
+    subtitle: "Engineering, Design & Calligraphy",
+    home: "Home",
+    philosophy: "Philosophy",
+    calligraphy: "Masterpieces",
+    engineering: "Engineering",
+    bookshop: "Sajeer Library",
+    research: "Research Center",
+    soon: "Soon",
+    switchLang: "العربية",
+    heroTitle: "Where Architectural Heritage Meets the Magic of Arabic Script",
+    heroDesc: "We shape your ideas with calculated engineering solutions, and draw your identity with calligraphy that pulses with authenticity, in a unique Andalusian blend embracing the future without forgetting the roots.",
+    discoverMore: "Discover Our Heritage",
+    
+    // About Section
+    aboutTitle: "The Sajeer Philosophy",
+    aboutSubtitle: "The Spirit of Andalusia in Modern Design",
+    aboutText1: "At Sajeer, we don't just design buildings or draw calligraphy; we revive the spirit of Islamic and Andalusian art and merge it with the genius of modern engineering.",
+    aboutText2: "Every corner we design, and every letter we write, carries a story of precision and a passion for timeless details.",
+    
+    // Stats
+    statProjects: "Completed Projects",
+    statClients: "Happy Clients",
+    statAwards: "Global Awards",
+    statYears: "Years of Experience",
+
+    // Gallery
+    galleryTitle: "Calligraphy Gallery",
+    galleryAll: "All",
+    galleryThuluth: "Thuluth",
+    galleryDiwani: "Diwani",
+    galleryKufi: "Kufic",
+
+    // Request Form
+    requestCustom: "Commission a Calligraphy",
+    wordPhrase: "Word or Phrase",
+    style: "Calligraphic Style",
+    useCase: "Use Case (Logo, Art Piece...)",
+    submitOrder: "Submit Request",
+    orderSuccess: "Your request has been received with great appreciation! We will contact you soon.",
+    
+    // Calculator
+    priceEstimator: "Engineering Estimation Matrix",
+    designType: "Design Category",
+    scale: "Project Scale",
+    estPrice: "Estimated Investment:",
+    currency: "USD",
+    types: {
+      arch: "Architecture",
+      struct: "Structural",
+      landscape: "Landscape",
+      furniture: "Interior",
+      qs: "Quantities"
+    },
+    scales: {
+      small: "Small (< 200 sqm)",
+      medium: "Medium (200 - 500 sqm)",
+      large: "Large (> 500 sqm)"
+    },
+    contactUs: "Contact Council",
+    rights: "All rights reserved © 2026 Sajeer.",
+    sampleCalligraphy: "From Our Masterpieces",
+    reqQuote: "Request Detailed Proposal",
+  }
+};
+
+const GeometricPattern = () => (
+  <svg className="absolute inset-0 w-full h-full opacity-[0.03] pointer-events-none z-0 mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237E1F24' fill-opacity='1'%3E%3Cpath d='M40 0l13.33 26.67L80 40 53.33 53.33 40 80 26.67 53.33 0 40l26.67-13.33L40 0zm0 11.31L31.31 28.69 11.31 40l20 11.31L40 68.69l8.69-17.38 20-11.31-20-11.31L40 11.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`, backgroundSize: '80px' }} />
+);
+
+const GoldDivider = () => (
+  <div className="w-full flex justify-center items-center py-12 opacity-80 reveal-on-scroll">
+    <div className="h-[2px] w-32 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+    <div className="w-3 h-3 rotate-45 border-2 border-[#D4AF37] mx-3 shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
+    <div className="h-[2px] w-32 bg-gradient-to-r from-[#D4AF37] via-[#D4AF37] to-transparent"></div>
+  </div>
+);
+
+const AndalusianArch = ({ children, className = "" }) => (
+  <div className={`relative overflow-hidden ${className}`} style={{ borderRadius: '50% 50% 0 0 / 15% 15% 0 0' }}>
+    {children}
+  </div>
+);
+
+export default function App() {
+  const [lang, setLang] = useState('ar');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  
+  const t = translations[lang];
+  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+  // Core Palette
+  const colors = {
+    primary: '#7E1F24', // Deep Crimson
+    primaryDark: '#5c1419',
+    gold: '#D4AF37',    // Antique Gold
+    goldLight: '#F3E5AB',
+    bg: '#FDFBF7',      // Warm Ivory
+    bgDarker: '#f5f0e6',
+    text: '#2C2A29',    // Charcoal
+  };
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => setIsLoaded(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Custom Cursor tracking
+    const updateCursor = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+    
+    // Interactive Elements Hover Tracking
+    const handleMouseOver = (e) => {
+      if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(e.target.tagName) || e.target.closest('.interactive')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+
+    window.addEventListener('mousemove', updateCursor);
+    window.addEventListener('mouseover', handleMouseOver);
+    
+    return () => {
+      window.removeEventListener('mousemove', updateCursor);
+      window.removeEventListener('mouseover', handleMouseOver);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Intersection Observer for Scroll Animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [isLoaded, lang]); // Re-run when DOM changes
+
+  const toggleLang = () => {
+    setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
+    // reset scroll reveals
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => el.classList.remove('revealed'));
+  };
+
+  const [calligraphyForm, setCalligraphyForm] = useState({ word: '', style: 'thuluth', useCase: '' });
+  const [orderSubmitted, setOrderSubmitted] = useState(false);
+  const [activeGalleryTab, setActiveGalleryTab] = useState('all');
+
+  const handleCalligraphySubmit = (e) => {
+    e.preventDefault();
+    if(calligraphyForm.word) {
+      setOrderSubmitted(true);
+      setTimeout(() => setOrderSubmitted(false), 5000);
+      setCalligraphyForm({ word: '', style: 'thuluth', useCase: '' });
+    }
+  };
+
+  const [designType, setDesignType] = useState('arch');
+  const [projectScale, setProjectScale] = useState('medium');
+  const [estimatedPrice, setEstimatedPrice] = useState(0);
+
+  useEffect(() => {
+    const prices = { arch: 800, struct: 600, landscape: 450, furniture: 400, qs: 250 };
+    const multipliers = { small: 1, medium: 1.8, large: 3.5 };
+    
+    // Add a little animation effect to the number changing
+    let start = estimatedPrice;
+    const end = Math.round((prices[designType] || 0) * (multipliers[projectScale] || 1));
+    const duration = 500;
+    const startTime = performance.now();
+
+    const animateNumber = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      setEstimatedPrice(Math.round(start + (end - start) * easeProgress));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateNumber);
+      }
+    };
+    
+    requestAnimationFrame(animateNumber);
+  }, [designType, projectScale]);
+
+  const galleryItems = [
+    { id: 1, type: 'thuluth', letter: 'س', label: 'سجيـر' },
+    { id: 2, type: 'diwani', letter: 'و', label: 'وداد' },
+    { id: 3, type: 'kufi', letter: 'م', label: 'مجد' },
+    { id: 4, type: 'thuluth', letter: 'ح', label: 'حياة' },
+    { id: 5, type: 'diwani', letter: 'ن', label: 'نور' },
+    { id: 6, type: 'kufi', letter: 'ق', label: 'قوة' },
+  ];
+
+  const filteredGallery = activeGalleryTab === 'all' 
+    ? galleryItems 
+    : galleryItems.filter(item => item.type === activeGalleryTab);
+
+  const globalCss = `
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
+    
+    body {
+      cursor: none; /* Hide default cursor for desktop */
+    }
+    
+    /* Responsive cursor hide for mobile */
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      .custom-cursor { display: none !important; }
+    }
+
+    .font-arabic { font-family: 'Tajawal', sans-serif; }
+    .font-arabic-title { font-family: 'Amiri', serif; }
+    .font-english { font-family: 'Tajawal', sans-serif; }
+    .font-english-title { font-family: 'Cinzel', serif; }
+    
+    .glass-panel {
+      background: rgba(253, 251, 247, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .glass-panel-dark {
+      background: rgba(126, 31, 36, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    /* Animations */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .delay-100 { transition-delay: 100ms; }
+    .delay-200 { transition-delay: 200ms; }
+    .delay-300 { transition-delay: 300ms; }
+
+    .gold-gradient-text {
+      background: linear-gradient(to right, #b8860b, #D4AF37, #fada5e, #D4AF37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(2deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    .floating-el { animation: float 6s ease-in-out infinite; }
+    
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-slow { animation: spin-slow 20s linear infinite; }
+    
+    /* Preloader Draw */
+    .draw-path {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: draw 2s ease-in-out forwards;
+    }
+    @keyframes draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #D4AF37;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    
+    /* Hide scrollbar for gallery */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  `;
+
+  if (!isLoaded) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+        <style>{globalCss}</style>
+        <div className="text-center flex flex-col items-center">
+          <svg className="w-32 h-32 mb-6" viewBox="0 0 100 100" fill="none" stroke={colors.gold} strokeWidth="2">
+            {/* Abstract Andalusian Star/Logo */}
+            <path className="draw-path" d="M50 5 L60 40 L95 50 L60 60 L50 95 L40 60 L5 50 L40 40 Z" />
+            <circle cx="50" cy="50" r="15" className="draw-path" strokeWidth="1" strokeDasharray="5,5" />
+          </svg>
+          <div className="text-3xl font-bold tracking-widest text-[#D4AF37]" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+            {t.brandName}
+          </div>
+          <div className="mt-4 w-48 h-1 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-full bg-[#D4AF37] w-full origin-left animate-[scale-x_2s_ease-in-out]" style={{ transformOrigin: dir === 'rtl' ? 'right' : 'left' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <style>{globalCss}</style>
+
+      {/* Custom Cursor */}
+      <div 
+        className="custom-cursor fixed top-0 left-0 pointer-events-none z-[100] mix-blend-difference transition-transform duration-100 ease-out flex items-center justify-center"
+        style={{ 
+          transform: `translate(${cursorPos.x - 16}px, ${cursorPos.y - 16}px) scale(${isHovering ? 1.5 : 1})`,
+          width: '32px', height: '32px'
+        }}
+      >
+        <div className="w-2 h-2 rounded-full bg-[#D4AF37]"></div>
+        <div className={`absolute inset-0 rounded-full border border-[#D4AF37] transition-all duration-300 ${isHovering ? 'scale-150 opacity-0' : 'scale-100 opacity-50'}`}></div>
+      </div>
+
+      <div 
+        dir={dir} 
+        className={`min-h-screen relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-white ${lang === 'ar' ? 'font-arabic' : 'font-english'}`}
+        style={{ backgroundColor: colors.bg, color: colors.text }}
+      >
+        <GeometricPattern />
+
+        {/* Dynamic Sticky Header */}
+        <header className="fixed top-0 w-full z-50 glass-panel shadow-[0_4px_30px_rgba(0,0,0,0.05)] border-b" style={{ borderBottomColor: `${colors.gold}40` }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20 md:h-24 transition-all duration-300">
+              
+              {/* Brand Logo */}
+              <div className="flex items-center gap-3 md:gap-4 interactive cursor-pointer group">
+                <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#7E1F24] rounded-tr-2xl rounded-bl-2xl rounded-tl-md rounded-br-md rotate-45 group-hover:rotate-90 transition-transform duration-700 shadow-lg"></div>
+                  <div className="absolute inset-0 border border-[#D4AF37] rounded-tr-2xl rounded-bl-2xl rounded-tl-md rounded-br-md rotate-45 scale-110"></div>
+                  <span className="relative text-white text-xl md:text-2xl z-10" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                    {lang === 'ar' ? 'س' : 'S'}
+                  </span>
+                </div>
+                <div className="flex flex-col pt-1">
+                  <span className="text-2xl md:text-3xl font-bold tracking-wide" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                    {t.brandName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex gap-10 items-center">
+                {['philosophy', 'calligraphy', 'engineering'].map((item) => (
+                  <a 
+                    key={item} 
+                    href={`#${item}`} 
+                    className="nav-link relative text-sm md:text-base font-bold text-stone-800 uppercase tracking-widest hover:text-[#7E1F24] transition-colors interactive"
+                  >
+                    {t[item]}
+                  </a>
+                ))}
+                <a href="#soon" className="text-sm md:text-base font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1 interactive cursor-not-allowed">
+                  {t.bookshop} <Lock size={14} />
+                </a>
+              </nav>
+
+              {/* Actions */}
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={toggleLang}
+                  className="hidden md:flex items-center gap-2 text-sm font-bold px-5 py-2 rounded-full border-2 interactive transition-all hover:bg-[#7E1F24] hover:text-white"
+                  style={{ borderColor: colors.primary, color: colors.primary, fontFamily: lang === 'ar' ? 'Cinzel' : 'Tajawal' }}
+                >
+                  <Globe size={16} />
+                  {t.switchLang}
+                </button>
+                
+                {/* Mobile Menu Toggle */}
+                <button 
+                  className="lg:hidden interactive p-2 text-[#7E1F24]"
+                  onClick={() => setMobileMenuOpen(true)}
+                >
+                  <Menu size={28} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Drawer */}
+        <div className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileMenuOpen(false)}>
+          <div 
+            className={`absolute top-0 ${dir === 'rtl' ? 'right-0' : 'left-0'} w-3/4 max-w-sm h-full bg-[#FDFBF7] shadow-2xl transition-transform duration-500 flex flex-col`}
+            style={{ transform: mobileMenuOpen ? 'translateX(0)' : `translateX(${dir === 'rtl' ? '100%' : '-100%'})` }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-6 flex justify-between items-center border-b border-stone-200">
+              <span className="text-2xl font-bold" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>{t.brandName}</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="text-stone-500 p-2"><X size={24} /></button>
+            </div>
+            <div className="flex flex-col p-6 gap-6 overflow-y-auto">
+               {['philosophy', 'calligraphy', 'engineering'].map((item) => (
+                  <a key={item} href={`#${item}`} onClick={() => setMobileMenuOpen(false)} className="text-lg font-bold border-b border-stone-100 pb-2">
+                    {t[item]}
+                  </a>
+               ))}
+               <button onClick={toggleLang} className="flex items-center gap-2 text-lg font-bold mt-4 text-[#7E1F24]">
+                  <Globe size={20} /> {t.switchLang}
+                </button>
+            </div>
+          </div>
+        </div>
+
+        <main className="relative z-10 pt-24">
+          
+          <section className="relative min-h-[90vh] flex items-center justify-center px-4 overflow-hidden">
+            {/* Animated Ambient Background Elements */}
+            <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-[#D4AF37]/10 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] bg-[#7E1F24]/5 rounded-full blur-[80px] pointer-events-none"></div>
+            
+            {/* Floating Islamic Geometry */}
+            <svg className="absolute top-32 left-10 w-24 h-24 text-[#D4AF37] opacity-20 spin-slow floating-el pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+               <path d="M50 0l12 38h40L70 60l12 40-32-24-32 24 12-40L0 38h40z"/>
+            </svg>
+            <svg className="absolute bottom-32 right-10 w-32 h-32 text-[#7E1F24] opacity-10 spin-slow floating-el pointer-events-none" style={{ animationDirection: 'reverse', animationDuration: '30s' }} viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
+               <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+               <polygon points="50,15 85,35 85,65 50,85 15,65 15,35" />
+            </svg>
+
+            <div className="relative z-10 text-center max-w-5xl mx-auto flex flex-col items-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/5 text-sm font-bold text-[#7E1F24] mb-8 reveal-on-scroll">
+                <Star size={14} /> {t.subtitle} <Star size={14} />
+              </div>
+              
+              <h1 
+                className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.2] reveal-on-scroll delay-100" 
+                style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}
+              >
+                {t.heroTitle.split(' ').map((word, i) => (
+                  <span key={i} className="inline-block mr-2 lg:mr-3 hover:text-[#D4AF37] transition-colors duration-300">
+                    {word}
+                  </span>
+                ))}
+              </h1>
+              
+              <p className="text-lg md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed text-stone-600 reveal-on-scroll delay-200">
+                {t.heroDesc}
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-6 reveal-on-scroll delay-300">
+                <a 
+                  href="#engineering" 
+                  className="interactive group relative px-10 py-4 font-bold text-white overflow-hidden rounded-t-[2rem] rounded-b-md shadow-2xl hover:shadow-[0_10px_40px_rgba(126,31,36,0.4)] transition-all duration-300"
+                  style={{ backgroundColor: colors.primary }}
+                >
+                  <div className="absolute inset-0 w-0 bg-[#D4AF37] transition-all duration-500 ease-out group-hover:w-full z-0"></div>
+                  <span className="relative z-10 flex items-center gap-2">
+                    {t.discoverMore} 
+                    {lang === 'ar' ? <ArrowLeft size={18} className="group-hover:-translate-x-2 transition-transform" /> : <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />}
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            {/* Scroll Indicator */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+              <span className="text-xs uppercase tracking-widest font-bold">Scroll</span>
+              <div className="w-px h-12 bg-gradient-to-b from-stone-800 to-transparent"></div>
+            </div>
+          </section>
+
+          <section id="philosophy" className="py-24 relative overflow-hidden bg-white/50 border-y border-[#D4AF37]/20">
+             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                 {/* Visual Side */}
+                 <div className="relative h-[600px] rounded-t-[50%] rounded-b-3xl overflow-hidden shadow-2xl reveal-on-scroll" style={{ backgroundColor: colors.primary }}>
+                   {/* Huge watermark letter */}
+                   <div className="absolute -right-20 -bottom-20 text-[400px] text-white/10 font-bold leading-none select-none pointer-events-none" style={{ fontFamily: 'Amiri' }}>
+                     {lang === 'ar' ? 'س' : 'S'}
+                   </div>
+                   
+                   {/* Abstract architecture/art representation using divs */}
+                   <div className="absolute inset-0 flex flex-col items-center justify-end p-10">
+                      <div className="w-full h-2/3 border-4 border-[#D4AF37]/30 rounded-t-[50%] relative overflow-hidden glass-panel-dark">
+                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-20"></div>
+                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-[#D4AF37]">
+                            <Compass size={80} strokeWidth={1} className="mx-auto mb-4 spin-slow" />
+                         </div>
+                      </div>
+                   </div>
+                 </div>
+
+                 {/* Text Side */}
+                 <div className="reveal-on-scroll delay-200">
+                   <h2 className="text-[#D4AF37] font-bold tracking-widest uppercase text-sm mb-4 flex items-center gap-4">
+                     <span className="w-12 h-px bg-[#D4AF37]"></span> {t.aboutSubtitle}
+                   </h2>
+                   <h3 className="text-4xl md:text-5xl font-bold mb-8" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                     {t.aboutTitle}
+                   </h3>
+                   <div className="space-y-6 text-lg text-stone-600 leading-relaxed font-medium">
+                     <p>{t.aboutText1}</p>
+                     <p>{t.aboutText2}</p>
+                   </div>
+                   
+                   {/* Stats Grid */}
+                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-12 pt-12 border-t border-stone-200">
+                     {[
+                       { icon: Briefcase, num: "150+", label: t.statProjects },
+                       { icon: Users, num: "98%", label: t.statClients },
+                       { icon: Award, num: "12", label: t.statAwards },
+                       { icon: Star, num: "10+", label: t.statYears }
+                     ].map((stat, i) => (
+                       <div key={i} className="flex flex-col gap-2">
+                         <stat.icon size={24} style={{ color: colors.gold }} />
+                         <span className="text-3xl font-bold text-stone-800">{stat.num}</span>
+                         <span className="text-xs font-bold uppercase tracking-wide text-stone-500">{stat.label}</span>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             </div>
+          </section>
+
+          <section id="calligraphy" className="py-32 scroll-mt-20 relative">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              
+              <div className="text-center mb-16 reveal-on-scroll">
+                <PenTool size={48} className="mx-auto mb-6" style={{ color: colors.gold }} />
+                <h3 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                  {t.calligraphy}
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                
+                {/* Advanced Filterable Gallery */}
+                <div className="lg:col-span-7 reveal-on-scroll delay-100">
+                  {/* Tabs */}
+                  <div className="flex flex-wrap justify-center gap-2 mb-10 bg-white p-2 rounded-full shadow-sm border border-stone-100 inline-flex mx-auto">
+                    {[
+                      { id: 'all', label: t.galleryAll },
+                      { id: 'thuluth', label: t.galleryThuluth },
+                      { id: 'diwani', label: t.galleryDiwani },
+                      { id: 'kufi', label: t.galleryKufi }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveGalleryTab(tab.id)}
+                        className={`interactive px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 ${activeGalleryTab === tab.id ? 'bg-[#7E1F24] text-white shadow-md' : 'text-stone-500 hover:bg-stone-100'}`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6">
+                    {filteredGallery.map((item, idx) => (
+                      <div key={item.id} className={`group cursor-pointer perspective-1000 animate-in fade-in zoom-in duration-500`} style={{ animationDelay: `${idx * 100}ms` }}>
+                        <div className="relative aspect-[3/4] rounded-t-full rounded-b-xl overflow-hidden shadow-lg transition-transform duration-500 group-hover:rotate-y-12 group-hover:-translate-y-2 group-hover:shadow-2xl border-4" style={{ borderColor: colors.goldLight, backgroundColor: '#fff' }}>
+                          <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]"></div>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span 
+                              className="text-7xl lg:text-8xl text-stone-800 drop-shadow-md group-hover:scale-110 transition-transform duration-700"
+                              style={{ fontFamily: item.type === 'kufi' ? 'Tajawal' : 'Amiri', fontWeight: item.type === 'kufi' ? '900' : '400' }}
+                            >
+                              {item.letter}
+                            </span>
+                          </div>
+                          {/* Overlay on hover */}
+                          <div className="absolute inset-0 bg-[#7E1F24]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
+                            <Maximize size={24} className="mb-2" />
+                            <span className="font-bold text-lg">{item.label}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Form - Glassmorphism Premium Card */}
+                <div className="lg:col-span-5 reveal-on-scroll delay-200">
+                  <div className="sticky top-32 glass-panel rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-8 md:p-10 border-2" style={{ borderColor: `${colors.gold}50` }}>
+                    <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#D4AF37]/20 rounded-full blur-xl"></div>
+                    
+                    <h4 className="text-2xl font-bold mb-8 flex items-center gap-3" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                      <span className="w-8 h-8 rounded-full bg-[#7E1F24] flex items-center justify-center text-white text-sm">1</span>
+                      {t.requestCustom}
+                    </h4>
+                    
+                    {orderSubmitted ? (
+                      <div className="h-[300px] flex flex-col items-center justify-center text-center animate-in fade-in duration-500">
+                        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+                           <CheckCircle2 size={40} />
+                        </div>
+                        <p className="font-bold text-xl text-stone-800">{t.orderSuccess}</p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleCalligraphySubmit} className="space-y-6 relative z-10">
+                        <div className="group">
+                          <label className="block text-xs font-bold mb-2 text-stone-500 uppercase tracking-widest group-focus-within:text-[#7E1F24] transition-colors">{t.wordPhrase}</label>
+                          <input 
+                            type="text" required
+                            value={calligraphyForm.word}
+                            onChange={(e) => setCalligraphyForm({...calligraphyForm, word: e.target.value})}
+                            className="interactive w-full bg-white border-2 border-stone-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#7E1F24] focus:ring-4 focus:ring-[#7E1F24]/10 transition-all text-lg shadow-inner"
+                            placeholder={lang === 'ar' ? "اكتب هنا..." : "Type here..."}
+                          />
+                        </div>
+
+                        <div className="group">
+                          <label className="block text-xs font-bold mb-2 text-stone-500 uppercase tracking-widest">{t.style}</label>
+                          <div className="grid grid-cols-2 gap-3">
+                             {[
+                               {id: 'thuluth', label: t.galleryThuluth},
+                               {id: 'diwani', label: t.galleryDiwani},
+                               {id: 'kufi', label: t.galleryKufi},
+                               {id: 'free', label: lang === 'ar' ? 'حر' : 'Freehand'}
+                             ].map(s => (
+                               <div 
+                                 key={s.id}
+                                 onClick={() => setCalligraphyForm({...calligraphyForm, style: s.id})}
+                                 className={`interactive cursor-pointer border-2 rounded-xl text-center py-3 font-bold transition-all ${calligraphyForm.style === s.id ? 'border-[#7E1F24] bg-[#7E1F24]/5 text-[#7E1F24]' : 'border-stone-200 text-stone-500 hover:border-stone-300'}`}
+                               >
+                                 {s.label}
+                               </div>
+                             ))}
+                          </div>
+                        </div>
+
+                        <div className="group pt-4">
+                          <button 
+                            type="submit" 
+                            className="interactive w-full py-4 text-white font-bold flex items-center justify-center gap-3 rounded-xl shadow-[0_10px_20px_rgba(126,31,36,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(126,31,36,0.4)] transition-all uppercase tracking-widest text-lg"
+                            style={{ backgroundColor: colors.primary }}
+                          >
+                            <Send size={20} />
+                            {t.submitOrder}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <GoldDivider />
+
+          <section id="engineering" className="py-32 scroll-mt-20 relative bg-[#FDFBF7]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              
+              <div className="text-center mb-16 reveal-on-scroll">
+                <Building2 size={48} className="mx-auto mb-6" style={{ color: colors.gold }} />
+                <h3 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.primary, fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                  {t.engineering}
+                </h3>
+              </div>
+
+              <div className="bg-white rounded-[2rem] shadow-2xl border border-stone-100 overflow-hidden reveal-on-scroll delay-100">
+                <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
+                  
+                  {/* Left/Right Side - The Form/Matrix */}
+                  <div className="lg:col-span-3 p-8 md:p-12 lg:p-16">
+                     <h4 className="text-2xl font-bold mb-10 flex items-center gap-3" style={{ color: colors.text }}>
+                      <Calculator size={28} className="text-[#D4AF37]" />
+                      {t.priceEstimator}
+                    </h4>
+
+                    {/* Matrix Selection - Design Type */}
+                    <div className="mb-10">
+                      <label className="block text-sm font-bold mb-4 text-stone-500 uppercase tracking-widest">{t.designType}</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {[
+                          { id: 'arch', icon: Layout, label: t.types.arch },
+                          { id: 'struct', icon: Building2, label: t.types.struct },
+                          { id: 'furniture', icon: PaintBucket, label: t.types.furniture },
+                          { id: 'landscape', icon: Compass, label: t.types.landscape },
+                          { id: 'qs', icon: Calculator, label: t.types.qs }
+                        ].map(type => (
+                          <div
+                            key={type.id}
+                            onClick={() => setDesignType(type.id)}
+                            className={`interactive cursor-pointer flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${designType === type.id ? 'border-[#7E1F24] bg-[#7E1F24] text-white shadow-lg scale-105' : 'border-stone-100 bg-stone-50 text-stone-600 hover:border-[#D4AF37] hover:bg-white'}`}
+                          >
+                            <type.icon size={24} strokeWidth={designType === type.id ? 2 : 1.5} />
+                            <span className="text-sm font-bold text-center">{type.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Project Scale Slider/Buttons */}
+                    <div>
+                      <label className="block text-sm font-bold mb-4 text-stone-500 uppercase tracking-widest">{t.scale}</label>
+                      <div className="flex bg-stone-100 p-1 rounded-2xl">
+                         {['small', 'medium', 'large'].map(scale => (
+                           <button
+                             key={scale}
+                             onClick={() => setProjectScale(scale)}
+                             className={`interactive flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all ${projectScale === scale ? 'bg-white text-[#7E1F24] shadow-md' : 'text-stone-500 hover:text-stone-800'}`}
+                           >
+                             {t.scales[scale]}
+                           </button>
+                         ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right/Left Side - The Result Panel */}
+                  <div className="lg:col-span-2 relative p-8 md:p-12 flex flex-col justify-center text-center overflow-hidden" style={{ backgroundColor: colors.primary }}>
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] mix-blend-overlay"></div>
+                    <div className="absolute -bottom-20 -right-20 w-64 h-64 border-[40px] rounded-full opacity-20" style={{ borderColor: colors.gold }}></div>
+                    
+                    <div className="relative z-10">
+                      <p className="text-white/70 font-bold uppercase tracking-widest mb-4 text-sm">{t.estPrice}</p>
+                      
+                      <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-lg flex items-baseline justify-center gap-2" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                        {estimatedPrice.toLocaleString()} 
+                        <span className="text-2xl font-medium text-[#D4AF37]">{t.currency}</span>
+                      </div>
+                      
+                      <p className="text-white/50 text-sm mb-12 max-w-xs mx-auto leading-relaxed">
+                        * {lang === 'ar' ? 'هذا التقدير مبدئي ويعتمد على التفاصيل النهائية للمشروع.' : 'This is a rough estimate and depends on final project details.'}
+                      </p>
+
+                      <button className="interactive w-full py-4 bg-white text-[#7E1F24] font-bold rounded-xl shadow-xl hover:bg-[#D4AF37] hover:text-white transition-colors uppercase tracking-widest flex items-center justify-center gap-2">
+                         <Mail size={18} /> {t.reqQuote}
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+        </main>
+
+        <footer className="relative mt-32 pt-20 pb-10 overflow-hidden" style={{ backgroundColor: colors.primaryDark }}>
+          {/* Decorative Border */}
+          <div className="absolute top-0 left-0 w-full h-3 bg-[url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'12\\' viewBox=\\'0 0 40 12\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M20 0l20 12H0z\\' fill=\\'%23D4AF37\\' fill-opacity=\\'1\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E')]"></div>
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="flex flex-col items-center text-center">
+              
+              <div className="w-20 h-20 border-2 border-[#D4AF37] rounded-full flex items-center justify-center mb-8 rotate-45">
+                 <div className="text-3xl text-[#D4AF37] -rotate-45" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                    {lang === 'ar' ? 'س' : 'S'}
+                 </div>
+              </div>
+
+              <h4 className="text-3xl font-bold text-white mb-10" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>{t.contactUs}</h4>
+              
+              <div className="flex gap-6 mb-16">
+                {[Phone, Mail, Globe].map((Icon, idx) => (
+                  <a key={idx} href="#" className="interactive w-14 h-14 rounded-full bg-white/5 backdrop-blur-sm flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#7E1F24] transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.1)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:-translate-y-2 border border-[#D4AF37]/30">
+                    <Icon size={24} />
+                  </a>
+                ))}
+              </div>
+
+              <div className="w-full max-w-lg border-t border-[#D4AF37]/20 pt-8 flex flex-col items-center gap-4">
+                 <div className="text-4xl font-bold tracking-widest text-[#D4AF37]/50" style={{ fontFamily: lang === 'ar' ? 'Amiri' : 'Cinzel' }}>
+                   {t.brandName}
+                 </div>
+                 <p className="text-xs text-white/40 uppercase tracking-widest font-bold">
+                   {t.rights}
+                 </p>
+              </div>
+
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
+  );
+}
